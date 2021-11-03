@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "waste_manager",
-    "slug": "waste_manager",
+    "name": "SaveMoneyManager",
+    "slug": "SaveMoneyManager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
