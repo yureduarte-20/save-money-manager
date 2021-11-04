@@ -3,10 +3,10 @@ import { View, Text, FlatList } from "react-native";
 import { Paragraph, FAB } from 'react-native-paper'
 import styles from "./styles";
 import WastingRepository from "../../Repository/WastingRepository";
+import { AntDesign } from "@expo/vector-icons"
 import 'faker/locale/pt_BR'
 const Dashboard = ({ navigation }) => {
     const [wastings, setWasting] = useState([])
-    const [iconName, setIconName] = useState('plus')
     useEffect(() => {
         const starting = async () => {
             var w = await WastingRepository.getAllRegiters()
@@ -14,7 +14,6 @@ const Dashboard = ({ navigation }) => {
         }
         starting()
     }, [])
-    console.log(wastings)
     const WastingRender = ({ item }) => {
         const data = new Date(item.date)
         return (
@@ -36,12 +35,9 @@ const Dashboard = ({ navigation }) => {
                     keyExtractor={item => item.id} />) : (<Text >Nada</Text>)
             }
             <FAB style={styles.FAB}
-                icon={iconName}
-                label="pressione"
+                icon={'plus'}
                 animated={true}
-                onPress={() => setIconName( state => state === "plus" ? "caretup" : "plus" )}>
-                
-            </FAB>
+                onPress={() => navigation.navigate('New')} />
         </View>
     )
 }
