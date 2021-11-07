@@ -6,7 +6,8 @@ const theme = {
   roundness: 2,
   colors: {
     ...DefaultTheme.colors,
-    backgroundBarColor: '#3700b3'
+    primary_700: '#3700b3',
+    success:'#04b60c'
   },
 }
 export default function App() {
