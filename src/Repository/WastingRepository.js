@@ -5,9 +5,9 @@ import getRandomString from "../utils/random_string"
 const tableName = "wasting"
 export default {
     addRegister: async ({ date, description, title, value, category }) => {
-        let registers = await AsyncStorage.getItem(tableName)
-        if(registers)
-            registers = []
+        let registers = await AsyncStorage.getItem(tableName) || []
+        if(!Array.isArray(registers))
+            registers = JSON.parse(registers)
         registers.push({
             id: getRandomString(10),
             date: date,
