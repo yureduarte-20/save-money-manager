@@ -2,8 +2,13 @@ import { StyleSheet, StatusBar } from "react-native"
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+    scrollView: {
+        width:'100%' ,
+        flexWrap: 'wrap', 
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center'
+        flexDirection:'row'
     },
     wastingItem: {
         width: '100%',

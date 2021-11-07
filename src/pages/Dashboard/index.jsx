@@ -1,44 +1,60 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, FlatList } from "react-native";
-import { Paragraph, FAB } from 'react-native-paper'
+import { View, Text, SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import { Paragraph, FAB, withTheme, ActivityIndicator } from 'react-native-paper'
 import styles from "./styles";
 import WastingRepository from "../../Repository/WastingRepository";
-import { AntDesign } from "@expo/vector-icons"
 import 'faker/locale/pt_BR'
-const Dashboard = ({ navigation }) => {
+import { useNavigation } from "@react-navigation/native";
+import LatestWasting from '../../Components/LatestWastings'
+import LastMonthWasting from "../../Components/LastMonthWasting"
+const Dashboard = ({ theme }) => {
+    const navigation = useNavigation()
     const [wastings, setWasting] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [refreshing, setRefreshing] = useState(false);
+    const onRefresh = React.useCallback(() => {
+          setRefreshing(true);
+          WastingRepository.getAllRegiters().then(value => {
+          setWasting(value)
+          setRefreshing(false)
+      })
+    }, [wastings]);
     useEffect(() => {
         const starting = async () => {
+            setLoading(true)
             var w = await WastingRepository.getAllRegiters()
             setWasting(w)
+            setLoading(false);
         }
         starting()
     }, [])
-    const WastingRender = ({ item }) => {
-        const data = new Date(item.date)
-        return (
-            <View key={item.id} style={styles.wastingItem}>
-                <Paragraph>{item.name}</Paragraph>
-                <Paragraph>{item?.description}</Paragraph>
-                <Paragraph>{item.value}</Paragraph>
-                <Paragraph>{item.category}</Paragraph>
-                <Paragraph>{`${data.getDate()}/${data.getMonth()}/${data.getFullYear()}`}</Paragraph>
-            </View>
-        )
+    if(loading){
+        return(
+        <SafeAreaView style={styles.container}>
+            <ActivityIndicator />
+        </SafeAreaView>)
     }
     return (
-        <View style={styles.container}>
-            {wastings.length > 0 ? (
-                <FlatList
-                    data={wastings}
-                    renderItem={WastingRender}
-                    keyExtractor={item => item.id} />) : (<Text >Nada</Text>)
-            }
+        <SafeAreaView style={styles.container}>
+            <ScrollView
+                contentContainerStyle={styles.scrollView}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={[ theme.colors.primary_700]}
+                    />
+                }
+            >
+                <LatestWasting wastings={wastings} />
+                <LastMonthWasting  wastings={wastings} />
+            </ScrollView>
             <FAB style={styles.FAB}
                 icon={'plus'}
                 animated={true}
                 onPress={() => navigation.navigate('New')} />
-        </View>
+
+        </SafeAreaView>
     )
 }
-export default Dashboard;
+export default withTheme (Dashboard);
