@@ -2,7 +2,7 @@ const to_string_date = (date) => `${date.getDate() < 10 ? '0' + date.getDate() :
 const to_iso_string = (date) => {
     let [day, month, year] = date.split('/')
     let _d = [year, month, day].join('-')
-    return _d.concat('T00:00:00.000Z')
+    return _d.concat('T03:00:00.000Z')
 }
 const from_iso_to_string = (date) => {
     const [ year, month, day ] = date.split('T')[0].split('-')

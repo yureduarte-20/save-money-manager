@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import Routes from './src/routes';
+import { StatusBar } from "react-native"
 import { Provider as PaperProvider, DefaultTheme } from "react-native-paper"
 const theme = {
   ...DefaultTheme,
@@ -11,6 +12,10 @@ const theme = {
   },
 }
 export default function App() {
+  useEffect(()=>{
+    StatusBar.setBackgroundColor(theme.colors.primary_700)
+    StatusBar.setBarStyle('light-content')
+  }, [])
   return (
     <PaperProvider theme={theme}>
       <Routes />

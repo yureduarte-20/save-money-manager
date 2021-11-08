@@ -7,17 +7,18 @@ import 'faker/locale/pt_BR'
 import { useNavigation } from "@react-navigation/native";
 import LatestWasting from '../../Components/LatestWastings'
 import LastMonthWasting from "../../Components/LastMonthWasting"
+import Chart from "../../Components/Chart";
 const Dashboard = ({ theme }) => {
     const navigation = useNavigation()
     const [wastings, setWasting] = useState([])
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = React.useCallback(() => {
-          setRefreshing(true);
-          WastingRepository.getAllRegiters().then(value => {
-          setWasting(value)
-          setRefreshing(false)
-      })
+        setRefreshing(true);
+        WastingRepository.getAllRegiters().then(value => {
+            setWasting(value)
+            setRefreshing(false)
+        })
     }, [wastings]);
     useEffect(() => {
         const starting = async () => {
@@ -28,11 +29,11 @@ const Dashboard = ({ theme }) => {
         }
         starting()
     }, [])
-    if(loading){
-        return(
-        <SafeAreaView style={styles.container}>
-            <ActivityIndicator />
-        </SafeAreaView>)
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <ActivityIndicator />
+            </SafeAreaView>)
     }
     return (
         <SafeAreaView style={styles.container}>
@@ -42,12 +43,15 @@ const Dashboard = ({ theme }) => {
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        colors={[ theme.colors.primary_700]}
+                        colors={[theme.colors.primary_700]}
                     />
                 }
             >
-                <LatestWasting wastings={wastings} />
-                <LastMonthWasting  wastings={wastings} />
+                <View style={{width:'100%', flexDirection:'row'}}>
+                    <LatestWasting wastings={wastings} />
+                    <LastMonthWasting wastings={wastings} />
+                </View>
+                <Chart wastings={wastings} scale={0.9} />
             </ScrollView>
             <FAB style={styles.FAB}
                 icon={'plus'}
@@ -57,4 +61,4 @@ const Dashboard = ({ theme }) => {
         </SafeAreaView>
     )
 }
-export default withTheme (Dashboard);
+export default withTheme(Dashboard);

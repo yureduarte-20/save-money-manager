@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
-import { FlatList, SafeAreaView, View, TouchableOpacity } from "react-native"
+import { FlatList, SafeAreaView, View, TouchableOpacity, Button } from "react-native"
 import { Paragraph, Title, Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text } from "react-native-paper"
 import { MaterialIcons } from "@expo/vector-icons"
 import WastingRepository from "../../Repository/WastingRepository"
@@ -107,7 +107,11 @@ const ListAllWastings = ({ route}) => {
         setRefreshing(false)
     }
     const renderItems = ({ item }) => {
-        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', {wasting:item}) }} right={() => <Caption>{from_iso_to_string(item.date)}</Caption>} />
+        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', {wasting:item}) }} 
+                           description={() => <Caption>{from_iso_to_string(item.date)}</Caption>}
+                           right={ () => 
+                           <Caption>{`R$ ${ new Number(item.value).toFixed(2).replace('.', ',')}`} </Caption>}>
+                </List.Item> 
     }
     if (loading)
         return (
@@ -157,7 +161,7 @@ const ListAllWastings = ({ route}) => {
                     data={wasting}
                     renderItem={renderItems}
                     keyExtractor={(item) => item.id} 
-                    indicatorStyle={"black"}
+                    contentContainerStyle={{ width:'100%' }}
                     onRefresh={handleOnRefresh}/>
             </List.Section>
         </SafeAreaView>

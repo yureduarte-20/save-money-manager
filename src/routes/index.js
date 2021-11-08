@@ -4,7 +4,6 @@ import { StatusBar } from "react-native"
 import New from "../pages/New";
 import { withTheme } from "react-native-paper"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import TabRoutes from "./TabRoutes";
 import CustomAppBar from "../Components/CustomAppBar";
 import CustomTabBar from "../Components/CustomTabBar";
 import Edit from "../pages/Edit";
@@ -12,9 +11,6 @@ import Edit from "../pages/Edit";
 const Stack = createNativeStackNavigator();
 
 const Routes = ({ theme }) => {
-    console.log(theme.colors)
-    StatusBar.setBackgroundColor(theme.colors.primary_700)
-    StatusBar.setBarStyle('light-content')
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{

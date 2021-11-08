@@ -20,7 +20,8 @@ const styles = StyleSheet.create({
     },
     listSection:{
         width:'100%',
-        marginTop:30
+        marginTop:30,
+        flex:1
     }
 })
 export default styles

@@ -19,7 +19,7 @@ const LatestWastings = ({ wastings, theme }) => {
     console.log(w)
     return (
         <Card style={{ minHeight: 100, }} cardTitle={'Neste mês'}>
-            <View style={{ width: '100%', alignItems: 'center' }}>
+            <View style={{ width: '100%', alignItems: 'flex-start' }}>
                 <Text style={{ color: theme.colors.primary_700, fontSize: 18 }}>{w.length} compras </Text>
                 <Paragraph>Total de <Text style={{ color: theme.colors.success }}>{'R$' + String(amount.toFixed(2).replace('.', ','))}</Text></Paragraph>
             </View>
