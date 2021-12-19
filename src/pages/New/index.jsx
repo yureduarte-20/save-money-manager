@@ -5,19 +5,22 @@ import styles from "./styles"
 import { useNavigation } from "@react-navigation/native"
 import { TextInputMask } from 'react-native-masked-text'
 import categories from '../../Repository/CategoriesRepository'
-import { isValid } from "date-fns"
+import { isAfter, isValid } from "date-fns"
 import WastingRepository from "../../Repository/WastingRepository"
 import wastingFactory from "../../factories/wasting"
 import { to_iso_string, to_string_date } from "../../utils/dates"
 
 const New = ({ theme }) => {
     const [date, setDate] = useState(to_string_date(new Date()))
-     const navigation = useNavigation()
+    const navigation = useNavigation()
     const [active, setActive] = useState(false)
     const [currentSelectedCategory, setCurrentSelectedCategory] = useState(categories[categories.length - 1])
-    const [value, setValue] = useState("R$0,00")
+    const [value, setValue] = useState("")
     const [error, setError] = useState({
-        date: false,
+        date: {
+            message: "",
+            error: false,
+        },
         title: false,
         value: false
     })
@@ -28,23 +31,38 @@ const New = ({ theme }) => {
     const handleChangeDate = (e) => {
         setDate(e)
     }
+
+
+    const checkAllFields = () => {
+        console.log(title, value, date)
+        if (title === '') setError(state => ({ ...state, title: true }))
+        if (value === '' || value === "R$0,00") setError(state => ({ ...state, value: true }))
+        if (new Date(to_iso_string(date)).getTime() > new Date().getTime()) setError(state => ({ ...state, date: { message: "A data não pode ser maior que hoje", error: true } }))
+        return error.date.error || error.title || error.value
+    }
     const showMenu = () => setActive(true)
     const hideMenu = () => setActive(false)
     const handleOk = async () => {
-        setLoading(true)
-        console.log(date, to_iso_string(date))
-        let wasting = wastingFactory()
-        wasting.category = currentSelectedCategory.name
-        wasting.description = description
-        wasting.title = title,
-        wasting.date = new Date(to_iso_string(date))
-        const  [rs ,r_value] = value.split('$')
-        wasting.value = r_value.trim().replace(',', '.')
-        await WastingRepository.addRegister(wasting)
+        console.log(checkAllFields())
+        if (!checkAllFields()) {
+            setLoading(true)
+            let wasting = wastingFactory()
+            wasting.category = currentSelectedCategory.name
+            wasting.description = description.trim()
+            wasting.title = title.trim()
+            wasting.date = new Date(to_iso_string(date))
+            const [rs, r_value] = value.split('$')
+            let in_us = r_value.trim().replace(/\./g, '').replace(',', '.')
+            wasting.value = Number(in_us)
+            await WastingRepository.addRegister(wasting)
+            setLoading(false)
+            navigation.reset({
+                routes: [{ name: "HomePage" }]
+            })
+            return;
+        }
         setLoading(false)
-        navigation.reset({
-            routes:[{name:"HomePage"}]
-        })
+        
     }
     return (
         <SafeAreaView
@@ -60,9 +78,9 @@ const New = ({ theme }) => {
                                     : <Caption>Título</Caption>}
                                 <TextInput
                                     value={title}
+                                    mode={"outlined"}
                                     onChangeText={setTitle}
                                     label={error.title ? "*Obrigatório" : null}
-
                                     onEndEditing={() => {
                                         if (title === '') {
                                             setError(state => ({ ...state, title: true }))
@@ -76,12 +94,14 @@ const New = ({ theme }) => {
                                     error={error.title} />
                             </View>
                             <View style={{ width: '30%' }}>
-                                <Caption>Valor</Caption>
+                                <HelperText type={error.value ? "error" : "info"} visible={true}>{error.value ? "Valor inválido" : "Valor"}</HelperText>
                                 <TextInput
+                                    mode={"outlined"}
                                     value={value}
                                     onChangeText={setValue}
+                                    
                                     onEndEditing={() => {
-                                        if (value === 0) {
+                                        if (value === 0 || value === "R$0,00") {
                                             setError(state => ({ ...state, value: true }))
                                         } else {
 
@@ -97,10 +117,11 @@ const New = ({ theme }) => {
                                             options={{
                                                 maskType: "BRL",
                                                 precision: 2,
-
+                                                delimiter: false
                                             }} />
                                     )}
                                     error={error.value} />
+
                             </View>
                         </View>
                     </View>
@@ -135,7 +156,9 @@ const New = ({ theme }) => {
                                 status={todayCheck}
                                 label="Hoje"
                                 position={"leading"}
-                                onPress={() => { setTodayCheck(state => state === "checked" ? "unchecked" : "checked"); setDate(to_string_date(new Date())) }} />
+                                onPress={() => { setTodayCheck(state => state === "checked" ? "unchecked" : "checked"); 
+                                        setDate(to_string_date(new Date())); 
+                                        setError(state => ({...state, date:{ message: "", error:false }})) }} />
                         </View>
                         <TextInput
                             keyboardType="decimal-pad"
@@ -145,15 +168,16 @@ const New = ({ theme }) => {
                             style={styles.input}
                             onSubmitEditing={() => {
                                 let _d = to_iso_string(date)
-
-                                console.log(_d)
-                                if (!isValid(new Date(_d)))
-                                    setError(state => ({ ...state, date: true }))
+                                //console.log(_d)
+                                if (!isValid(new Date(_d)) || isAfter(new Date(_d), new Date()))
+                                    setError(state => ({ ...state, date: { message: "Data inválida", error: true } }))
                                 else
-                                    setError(state => ({ ...state, date: false }))
+                                    setError(state => ({ ...state, date: { error: false, message: "" } }))
+
+
                             }}
                             value={date}
-                            error={error.date}
+                            error={error.date.error}
                             render={props => (
                                 <TextInputMask
                                     {...props}
@@ -164,7 +188,7 @@ const New = ({ theme }) => {
                                 />
                             )}
                         />
-                        <HelperText type={"error"} visible={error.date}>A Data precisa ser válida!</HelperText>
+                        <HelperText type={"error"} visible={error.date.error}>{error.date.message}</HelperText>
                     </View>
                 </View>
                 <View styles={styles.section}>
@@ -175,23 +199,25 @@ const New = ({ theme }) => {
                         autoCorrect={true}
                         onChangeText={setDescription}
                         keyboardType={"ascii-capable"}
-                        numberOfLines={4} />
+                        mode={"outlined"}
+                        numberOfLines={4}
+                        textBreakStrategy={"balanced"} />
 
                 </View>
                 <View style={styles.submitContainer}>
-                    { loading ? <ActivityIndicator /> :
+                    {loading ? <ActivityIndicator /> :
                         <>
-                   <Button 
-                    style={styles.submitButton}
-                    mode={"contained"} 
-                    onPress={handleOk}>
-                        OK
-                    </Button>
-                    <Button
-                        style={styles.submitButton} 
-                        onPress={() => navigation.goBack()} 
-                        mode={"outlined"}>Cancelar</Button>
-                    </>
+                            <Button
+                                style={styles.submitButton}
+                                mode={"contained"}
+                                onPress={handleOk}>
+                                OK
+                            </Button>
+                            <Button
+                                style={styles.submitButton}
+                                onPress={() => navigation.goBack()}
+                                mode={"outlined"}>Cancelar</Button>
+                        </>
                     }
                 </View>
             </ScrollView>

@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { FlatList, SafeAreaView, View, TouchableOpacity, Button } from "react-native"
-import { Paragraph, Title, Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text } from "react-native-paper"
+import { Paragraph, Title, Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text, Snackbar } from "react-native-paper"
 import { MaterialIcons } from "@expo/vector-icons"
 import WastingRepository from "../../Repository/WastingRepository"
 import { useNavigation, useRoute } from "@react-navigation/native"
@@ -41,12 +41,15 @@ const ListAllWastings = ({ route}) => {
     const [loading, setLoadding] = useState(true)
     const [wasting, setWastings] = useState([])
     const [filter, setFilter] = useState("Todos")
-    const [visible, setVisible] = React.useState(false);
-    const [visible_2, setVisible_2] = React.useState(false);
-    const [selectedSecondOption, setSelectedSecondOption] = useState({ id: 2, name: "Decrescente" })
+    const [visible, setVisible] = useState(false);
+    const [visible_2, setVisible_2] = useState(false);
+
+    const [ snackVisible, setSnackVisible ] = useState(false)
+    const [ snackMessage, setSnackMessage ] = useState("")
+
+    const [ selectedSecondOption, setSelectedSecondOption] = useState({ id: 2, name: "Decrescente" })
     const [ refreshing, setRefreshing ] = useState(false)
     const navigation = useNavigation()
-    console.log('route',route)
     const openMenu = () => setVisible(true);
     const closeMenu = () => setVisible(false);
 
@@ -97,7 +100,13 @@ const ListAllWastings = ({ route}) => {
             default: return null;
         }
     }
-    const handleOnRefresh = async () =>{
+    const hasAMessage = useCallback((_message) =>{
+        if( _message.hasMessage ){
+            setSnackMessage(_message.message)
+            setSnackVisible(true)
+        }
+    })
+    const handleOnRefresh = useCallback( async () =>{
         //setLoadding(true);
         setRefreshing(true)
         let _wasting = await WastingRepository.getAllRegiters();
@@ -105,9 +114,9 @@ const ListAllWastings = ({ route}) => {
         //setLoadding(false)
         setWastings(_wasting)
         setRefreshing(false)
-    }
+    })
     const renderItems = ({ item }) => {
-        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', {wasting:item}) }} 
+        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', {wasting:item, onGoBack:handleOnRefresh}) }} 
                            description={() => <Caption>{from_iso_to_string(item.date)}</Caption>}
                            right={ () => 
                            <Caption>{`R$ ${ new Number(item.value).toFixed(2).replace('.', ',')}`} </Caption>}>
@@ -120,6 +129,7 @@ const ListAllWastings = ({ route}) => {
             </SafeAreaView>
         )
     return (
+        
         <SafeAreaView style={styles.container}>
             <View style={styles.searchContainer}>
                 <Menu

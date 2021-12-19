@@ -1,6 +1,5 @@
 import React from "react"
 import { NavigationContainer } from "@react-navigation/native"
-import { StatusBar } from "react-native"
 import New from "../pages/New";
 import { withTheme } from "react-native-paper"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -34,6 +33,7 @@ const Routes = ({ theme }) => {
                     <Stack.Screen 
                     name={"Edit"}
                     options={{
+                        headerShown: false,
                         headerTitle:"Editar",
                         animation:"slide_from_bottom"
                     }}

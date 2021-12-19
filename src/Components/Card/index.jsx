@@ -1,10 +1,11 @@
 import React from "react"
+import { StyleProp } from "react-native"
 import { Card as PaperCard, Title, withTheme } from "react-native-paper"
-import styles from "../../Components/Card/styles"
+import _styles from "../../Components/Card/styles"
 const Card = (props) => {
-    const { children, theme, style, cardTitle  } = props
+    const { children, theme, style , cardTitle  } = props
     return (
-        <PaperCard theme={theme} style={{...style, ...styles.container}}>
+        <PaperCard theme={theme} style={Object.assign(style, _styles.container)}>
             <PaperCard.Title
             title={cardTitle} />
             <PaperCard.Content>
@@ -12,5 +13,9 @@ const Card = (props) => {
             </PaperCard.Content>
         </PaperCard>
     )
+}
+
+Card.propTypes = {
+    style: StyleProp
 }
 export default withTheme (Card)

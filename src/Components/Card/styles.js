@@ -5,6 +5,8 @@ const styles = StyleSheet.create({
         width:'48%',
         minWidth: width * 0.30,
         margin:2,   
+        flexDirection:'row',
+        flex:1
     }
 })
 export default styles

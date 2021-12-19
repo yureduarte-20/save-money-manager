@@ -7,9 +7,8 @@ import { withTheme, Text, Paragraph, TextInput } from "react-native-paper"
 const LastMonthWasting = ({ wastings, theme }) => {
     const [w, setW] = useState(wastings.filter(item => {
         let lastMonth =subMonths( new Date(), 1 )
-        console.log(lastMonth)
         let _item = new Date(item.date)
-        if (lastMonth.getMonth() == _item.getMonth()) return item;
+        if (lastMonth.getMonth() == _item.getMonth()  && lastMonth.getFullYear( ) == _item.getFullYear()) return item;
     }))
     const amount = useMemo(() => {
         let _a = 0

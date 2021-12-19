@@ -1,32 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useReducer, useState } from "react"
 import { Dimensions } from "react-native"
 import { LineChart } from "react-native-chart-kit"
-import { withTheme, Card } from "react-native-paper"
+import { withTheme, Card, ActivityIndicator, Text } from "react-native-paper"
+import WastingRepository from "../../Repository/WastingRepository"
+import { subMonths } from "date-fns"
+import { date } from "faker/lib/locales/en"
 
 function to_month_year_format(date) {
-    return `${date.getMonth() + 1}/${date.getFullYear()}`
-}
-function sub(d) {
-    let [_month, _year] = d.split('/')
-    let month = new Number(_month)
-    let year = new Number(_year)
-    if (month <= 1) {
-        month = 12
-        year = year - 1
-    } else {
-        month = month - 1
-    }
-    return `${month < 10 ? '0' + month : month}/${year}`
-}
-function sortData(data) {
-    let d = data.map(item => item)
-    return d.sort((a, b) => {
-        return new Date(a.date).getTime() - new Date(b.date).getTime()
-    })
+    return `${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}/${date.getFullYear()}`
 }
 
 const screenWidth = Dimensions.get('window').width
-const Chart = ({ wastings, theme, scale }) => {
+const Chart = ({ theme, scale }) => {
+    const [loading, setLoading] = useState(true)
+    const [wastings, setWastings] = useState([])
     const [data, setData] = useState({
         labels: ["January", "February", "March", "April", "May", "June"],
         datasets: [
@@ -43,83 +30,94 @@ const Chart = ({ wastings, theme, scale }) => {
         ]
     })
     useEffect(() => {
-        const boot = () => {
-            let a = [];
-            let _w = []
-            let copy_wasting = sortData(wastings)
-            copy_wasting.forEach(item => {
-                let d = new Date(item.date)
-                if (!a.includes(to_month_year_format(d))) {
-                    a.push(to_month_year_format(d));
-                }
-                _w.push({
-                    ...item,
-                    _month: to_month_year_format(d)
-                })
+        function sortData(data) {
+            let d = data.map(item => item)
+            return d.sort((a, b) => {
+                return new Date(a.date).getTime() - new Date(b.date).getTime()
             })
-            a.sort((b, a) => a.localeCompare(b))
-            if (a.length < 4) {
-                let diff = 4 - a.length;
-                var prev = a[a.length - 1]
-                for (let i = diff; i > 0; i--) {
-                    a.push(sub(prev))
-                    prev = a[a.length - 1]
-                }
+        }
+        const boot = async () => {
+            setLoading(true)
+            var _wastings = await WastingRepository.getAllRegiters()  || []
+            if (_wastings.length <= 0)
+                return;
+            var max = new Date(_wastings[0].date);
 
-            } else if (a.length > 4) {
-                a = a.slice(a.length - 5, a.length - 1)
+
+            if (_wastings.length > 1) {
+                _wastings = sortData(_wastings)
+                max = _wastings.reduce((a, b) => {
+                    let a_date = new Date(a.date), b_date = new Date(b.date)
+                    return a_date.getTime() >= b_date.getTime() ? a_date : b_date
+                })
             }
-            a.sort((a, b) => a.localeCompare(b))
-            var temp = []
-            a.forEach(month => {
-                var value = 0;
-                _w.forEach(wasting => {
-                    if (month === wasting._month) {
-                        value += new Number(wasting.value)
+            let dates = [max]
+            for (let i = 0; i < 3; i++) {
+                dates.push(subMonths(dates[dates.length - 1], 1))
+            }
+            dates.sort((a, b) => a.getTime() - b.getTime())
+            const amount = dates.map(label_date => {
+                let temp = 0;
+                var _label_date = new Date(label_date)
+                _wastings.forEach(item => {
+                    var date = new Date(item.date)
+                    if ( (date.getMonth() === _label_date.getMonth()) && (date.getFullYear() == _label_date.getFullYear()) ) {
+                        temp += new Number(item.value)
                     }
                 })
-                temp.push(value)
-                value = 0
+                return temp;
             })
+            dates = dates.map(item => to_month_year_format(new Date(item)))
+            //console.log(dates, amount)
+            setWastings(_wastings)
             setData({
-                labels: a,
+                labels: dates,
                 datasets: [
-                    { data: temp }
-                ]
+                    {
+                        data: amount
+                    }]
             })
-            return 
+            setLoading(false)
         }
         boot()
     }, [])
-
+    if (wastings.length <= 0)
+        return (
+            <Card style={{ width: '95%' }}>
+                <Card.Content style={{ width: '100%', alignItems: 'flex-start' }}>
+                    <Text>Dados Insuficientes para plotar em gráfico</Text>
+                </Card.Content>
+            </Card>
+        )
     return (
         <Card style={{ width: '95%' }}>
             <Card.Content style={{ width: '100%', alignItems: 'flex-start' }}>
-                <LineChart
-                    width={screenWidth * (scale || 0.8)}
-                    data={data}
-                    height={220}
-                    withInnerLines={false}
-                    chartConfig={{
-                        backgroundColor: theme.colors.surface,
-                        backgroundGradientFrom: theme.colors.surface,
-                        backgroundGradientTo: theme.colors.surface,
-                        decimalPlaces: 2, // optional, defaults to 2dp
-                        propsForBackgroundLines: {
+                {!loading ?
+                    <LineChart
+                        width={screenWidth * (scale || 0.8)}
+                        data={data}
+                        height={220}
+                        withInnerLines={false}
+                        chartConfig={{
+                            backgroundColor: theme.colors.surface,
+                            backgroundGradientFrom: theme.colors.surface,
+                            backgroundGradientTo: theme.colors.surface,
+                            decimalPlaces: 2, // optional, defaults to 2dp
+                            propsForBackgroundLines: {
 
-                        },
-                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                        color: (opacity = 1) => `rgba(55, 0, 179, ${opacity})`,
-                        style: {
-                            borderRadius: 16
-                        },
-                        propsForDots: {
-                            r: "2",
-                            strokeWidth: "2",
-                            stroke: theme.colors.primary
-                        },
-                    }}
-                />
+                            },
+                            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                            color: (opacity = 1) => `rgba(55, 0, 179, ${opacity})`,
+                            style: {
+                                borderRadius: 16
+                            },
+                            propsForDots: {
+                                r: "2",
+                                strokeWidth: "2",
+                                stroke: theme.colors.primary
+                            },
+                        }}
+                    /> : <ActivityIndicator />}
             </Card.Content>
         </Card>
     )

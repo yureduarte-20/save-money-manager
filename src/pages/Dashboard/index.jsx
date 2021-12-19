@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { View, Text, SafeAreaView, ScrollView, RefreshControl } from "react-native";
-import { Paragraph, FAB, withTheme, ActivityIndicator } from 'react-native-paper'
+import { Paragraph, FAB, withTheme, ActivityIndicator, Title } from 'react-native-paper'
 import styles from "./styles";
 import WastingRepository from "../../Repository/WastingRepository";
 import 'faker/locale/pt_BR'
@@ -13,13 +13,13 @@ const Dashboard = ({ theme }) => {
     const [wastings, setWasting] = useState([])
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false);
-    const onRefresh = React.useCallback(() => {
+    const onRefresh = async () => {
         setRefreshing(true);
-        WastingRepository.getAllRegiters().then(value => {
-            setWasting(value)
-            setRefreshing(false)
-        })
-    }, [wastings]);
+        const v = await WastingRepository.getAllRegiters()
+        setWasting(v)
+        setRefreshing(false)
+
+    }
     useEffect(() => {
         const starting = async () => {
             setLoading(true)
@@ -29,12 +29,22 @@ const Dashboard = ({ theme }) => {
         }
         starting()
     }, [])
-    if (loading) {
+    if (loading || refreshing) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={{...styles.container, justifyContent:'center'}}>
                 <ActivityIndicator />
             </SafeAreaView>)
     }
+    if (wastings.length <= 0)
+        return (
+            <SafeAreaView style={styles.container}>
+                <Title>Nada</Title>
+                <FAB style={styles.FAB}
+                    icon={'plus'}
+                    animated={true}
+                    onPress={() => navigation.navigate('New')} />
+            </SafeAreaView>
+        )
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView
@@ -47,11 +57,11 @@ const Dashboard = ({ theme }) => {
                     />
                 }
             >
-                <View style={{width:'100%', flexDirection:'row'}}>
+                <View style={{ width: '100%', flexDirection: 'row' }}>
                     <LatestWasting wastings={wastings} />
                     <LastMonthWasting wastings={wastings} />
                 </View>
-                <Chart wastings={wastings} scale={0.9} />
+                <Chart wastings={wastings} scale={1.0} />
             </ScrollView>
             <FAB style={styles.FAB}
                 icon={'plus'}
