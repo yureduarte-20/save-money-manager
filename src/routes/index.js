@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomAppBar from "../Components/CustomAppBar";
 import CustomTabBar from "../Components/CustomTabBar";
 import Edit from "../pages/Edit";
+import Settings from "../pages/Settings";
 
 const Stack = createNativeStackNavigator();
 
@@ -13,30 +14,38 @@ const Routes = ({ theme }) => {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{
-                header: props => <CustomAppBar theme={theme} {...props}/>
-            }} 
-            initialRouteName={"HomePage"} >
+                header: props => <CustomAppBar theme={theme} {...props} />
+            }}
+                initialRouteName={"HomePage"} >
 
                 <Stack.Screen options={{
-                    headerTitle: "Gerenciador de Gastos",    
-                }} 
-                name="HomePage" 
-                component={ CustomTabBar } />
+                    headerTitle: "Gerenciador de Gastos",
+                }}
+                    name="HomePage"
+                    component={CustomTabBar} />
                 <Stack.Screen
                     options={{
                         headerTitle: "Novo",
-                        animation:"slide_from_bottom"
+                        animation: "slide_from_bottom"
                     }}
                     name={"New"}
                     component={New} />
-                    <Stack.Screen 
+                <Stack.Screen
                     name={"Edit"}
                     options={{
                         headerShown: false,
-                        headerTitle:"Editar",
-                        animation:"slide_from_bottom"
+                        headerTitle: "Editar",
+                        animation: "slide_from_bottom"
                     }}
-                    component={Edit}/>
+                    component={Edit} />
+                <Stack.Screen
+                    component={Settings}
+                    name="Settings"
+                    options={{
+                        headerShown: true,
+                        headerTitle: "Configurações",
+                        animation: "simple_push"
+                    }} />
             </Stack.Navigator>
         </NavigationContainer>
     )

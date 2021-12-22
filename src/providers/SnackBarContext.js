@@ -2,7 +2,7 @@ import React from "react"
 const DEFAULT_STATE = {
     displayText: '',
     show: false,
-    timedOut: 3000
+    timedOut: 5000
 }
 export const SnackBarContext = React.createContext(DEFAULT_STATE)
 

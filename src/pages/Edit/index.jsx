@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, TouchableOpacity } from "react-native"
-import { withTheme, TextInput, Appbar, Menu, Text, Paragraph, Caption, HelperText, Subheading, Button, ActivityIndicator } from "react-native-paper"
+import { withTheme, TextInput, Appbar, Menu, Text, Paragraph, Caption, HelperText, Subheading, Button, ActivityIndicator, Divider } from "react-native-paper"
 import { to_iso_string, to_string_date } from "../../utils/dates";
 import { isValid, isAfter } from "date-fns"
 import { Feather } from "@expo/vector-icons"
@@ -20,7 +20,7 @@ const Edit = ({ route, theme, handleOpen }) => {
     const navigation = useNavigation()
     const [active, setActive] = useState(false);
     const [currentSelectedCategory, setCurrentSelectedCategory] = useState(categories.filter(item => wasting.category === item.name)[0])
-    const [value, setValue] = useState(wasting.value)
+    const [value, setValue] = useState( wasting.value )
     const [error, setError] = useState({
         date: {
             message: "",
@@ -36,11 +36,11 @@ const Edit = ({ route, theme, handleOpen }) => {
         setDate(e)
     }
 
-
+    
     const checkAllFields = () => {
         console.log(title, value, date)
         if (title === '') setError(state => ({ ...state, title: true }))
-        if (value === '' || value === "R$0,00") setError(state => ({ ...state, value: true }))
+        if (value === '' || value === "R$0,00" || value === 0) setError(state => ({ ...state, value: true }))
         if (new Date(to_iso_string(date)).getTime() > new Date().getTime()) setError(state => ({ ...state, date: { message: "A data não pode ser maior que hoje", error: true } }))
         return error.date.error || error.title || error.value
     }
@@ -57,18 +57,17 @@ const Edit = ({ route, theme, handleOpen }) => {
                 updated_wasting.description = description.trim()
                 updated_wasting.title = title.trim()
                 updated_wasting.date = new Date(to_iso_string(date))
-                const [rs, r_value] = value.split('$')
-                let in_us = r_value.trim().replace(/\./g, '').replace(',', '.')
+                const [rs, r_value] =  (typeof value === 'string') ? value.split('$') : ['$', value.toPrecision(2)]
+                let in_us = (typeof value === 'string') ? r_value.trim().replace(/\./g, '').replace(',', '.') : r_value
                 updated_wasting.value = Number(in_us)
                 await WastingRepository.update(updated_wasting)
-                setLoading(false)
                 handleOpen('Salvo com sucesso!')
             } catch (e) {
                 handleOpen('Desculpe, algo deu errado.')
                 console.log(e)
-                setLoading(false)
             } finally {
                 await onRefresh();
+                setLoading(false)
                 navigation.reset({
                     routes: [
                         {
@@ -77,15 +76,18 @@ const Edit = ({ route, theme, handleOpen }) => {
                             }
                         }]
                 })
+                return; 
             }
         }
-        //setLoading(false)
+        setLoading(false)
 
     }
     const deleteRegister = async (id) => {
+        setLoading(true)
         await WastingRepository.delete(id)
         await onRefresh();
         handleOpen('Deletado com sucesso!')
+        setLoading(false)
         navigation.reset({
             routes: [
                 {
@@ -115,8 +117,8 @@ const Edit = ({ route, theme, handleOpen }) => {
             <SafeAreaView
                 style={styles.container}>
                 <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.input}>
-                    <Paragraph style={styles.title}>Aqui, voce pode cadastrar um novo gasto que fez recentemente. Primeiramente, diga-nos o título, como o nome do lugar que você gastou.</Paragraph>
-                    <Caption>ex: Shopping, Mercadão, Feira</Caption>
+                    <Paragraph style={styles.title}>Edite os dados e pressione em salvar, se não em cancelar.</Paragraph>
+                    {/* <Caption>ex: Shopping, Mercadão, Feira</Caption> */}
                     <View style={styles.section}>
                         <View style={{ width: '100%' }}>
                             <View style={{ width: '100%', flexDirection: 'row' }}>
@@ -168,15 +170,14 @@ const Edit = ({ route, theme, handleOpen }) => {
                                                 }} />
                                         )}
                                         error={error.value} />
-
                                 </View>
                             </View>
                         </View>
                     </View>
-                    <Subheading style={styles.title}>Certo, agora dê um título para este gasto e quando você fez.</Subheading>
+                    {/* <Subheading style={styles.title}>Certo, agora dê um título para este gasto e quando você fez.</Subheading> */}
                     <View style={styles.section}>
                         <View style={styles.viewMenu}>
-                            <Caption style={{ marginTop: '10%' }}>Categoria</Caption>
+                            
                             <Menu
                                 visible={active}
                                 onDismiss={hideMenu}
@@ -188,13 +189,18 @@ const Edit = ({ route, theme, handleOpen }) => {
                                             letterSpacing: 2.0,
                                         }}>{currentSelectedCategory.name}</Text>
                                     </TouchableOpacity>}>
+
+                                        <Menu.Item disabled={true} title="Selecione uma categoria abaixo"/>
+                                        <Divider />
                                 {
+
                                     categories.map(item => {
                                         return <Menu.Item key={item.id}
                                             onPress={() => { setCurrentSelectedCategory(item); hideMenu() }} title={item.name} />
                                     })
                                 }
                             </Menu>
+                           {/*  <Caption style={{ marginTop: '10%' }}>Categoria</Caption> */}
                         </View>
                         <View style={styles.inputView}>
                             <TextInput

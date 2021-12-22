@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
     },
     inputView: {
         width: '50%',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        
     },
     input: {
         width: '100%',
@@ -48,9 +49,9 @@ const styles = StyleSheet.create({
     },
     buttonMenu: {
         width: '100%',
-        minWidth: 140,
-        marginTop: '10%',
-        minHeight: 60,
+        minWidth: 150,
+       // marginTop: '10%',
+        minHeight: 65,
         alignItems:'center',
         justifyContent:'center',
         

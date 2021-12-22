@@ -10,7 +10,6 @@ const SnackBar = ({ show, handleClose, displayText }) => {
             action={{
                 label: 'OK',
                 onPress: () => handleClose()
-
             }}
             onDismiss={() => { }}>
             {displayText ?? ''}

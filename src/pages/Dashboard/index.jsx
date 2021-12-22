@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { View, SafeAreaView, ScrollView, RefreshControl } from "react-native";
-import { FAB, withTheme, ActivityIndicator, Title } from 'react-native-paper'
+import { FAB, withTheme, ActivityIndicator, Title, Paragraph } from 'react-native-paper'
 import styles from "./styles";
 import WastingRepository from "../../Repository/WastingRepository";
 import 'faker/locale/pt_BR'
@@ -12,7 +12,7 @@ import Chart from "../../Components/Chart";
 const Dashboard = ({ theme }) => {
     const navigation = useNavigation()
     const [loading, setLoading] = useState(true)
-    const  { wastings, setRefresh, refresh, setWastings, onRefresh } = useWastings()
+    const { wastings, setRefresh, refresh, setWastings, onRefresh } = useWastings()
 
     useEffect(() => {
         const starting = async () => {
@@ -26,14 +26,18 @@ const Dashboard = ({ theme }) => {
     }, [])
     if (loading || refresh) {
         return (
-            <SafeAreaView style={{...styles.container, justifyContent:'center'}}>
+            <SafeAreaView style={{ ...styles.container, justifyContent: 'center' }}>
                 <ActivityIndicator />
             </SafeAreaView>)
     }
     if (wastings.length <= 0)
         return (
-            <SafeAreaView style={styles.container}>
-                <Title>Nada</Title>
+            <SafeAreaView style={Object.assign({
+                justifyContent: 'center',
+                alignItems: 'center'
+            }, styles.container)}>
+                <Title>Ainda não há compras!</Title>
+                <Paragraph>Para iniciar, pressione no botão de "+" abaixo.</Paragraph>
                 <FAB style={styles.FAB}
                     icon={'plus'}
                     animated={true}
@@ -62,7 +66,6 @@ const Dashboard = ({ theme }) => {
                 icon={'plus'}
                 animated={true}
                 onPress={() => navigation.navigate('New')} />
-
         </SafeAreaView>
     )
 }
