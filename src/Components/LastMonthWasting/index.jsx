@@ -3,8 +3,10 @@ import { View } from 'react-native'
 import Card from "../Card"
 import { subMonths } from "date-fns"
 import { withTheme, Text, Paragraph, TextInput } from "react-native-paper"
+import { useWastings } from "../../providers/Wastings"
 
-const LastMonthWasting = ({ wastings, theme }) => {
+const LastMonthWasting = ({  theme }) => {
+    const { wastings  } = useWastings()
     const [w, setW] = useState(wastings.filter(item => {
         let lastMonth =subMonths( new Date(), 1 )
         let _item = new Date(item.date)

@@ -9,8 +9,9 @@ import { isAfter, isValid } from "date-fns"
 import WastingRepository from "../../Repository/WastingRepository"
 import wastingFactory from "../../factories/wasting"
 import { to_iso_string, to_string_date } from "../../utils/dates"
+import { withSnackBarConsumer } from "../../providers/SnackBarContext"
 
-const New = ({ theme }) => {
+const New = ({ theme, handleOpen }) => {
     const [date, setDate] = useState(to_string_date(new Date()))
     const navigation = useNavigation()
     const [active, setActive] = useState(false)
@@ -42,24 +43,30 @@ const New = ({ theme }) => {
     }
     const showMenu = () => setActive(true)
     const hideMenu = () => setActive(false)
-    const handleOk = async () => {
+    const handleSubmit = async () => {
         console.log(checkAllFields())
         if (!checkAllFields()) {
-            setLoading(true)
-            let wasting = wastingFactory()
-            wasting.category = currentSelectedCategory.name
-            wasting.description = description.trim()
-            wasting.title = title.trim()
-            wasting.date = new Date(to_iso_string(date))
-            const [rs, r_value] = value.split('$')
-            let in_us = r_value.trim().replace(/\./g, '').replace(',', '.')
-            wasting.value = Number(in_us)
-            await WastingRepository.addRegister(wasting)
-            setLoading(false)
-            navigation.reset({
-                routes: [{ name: "HomePage" }]
-            })
-            return;
+            try{
+                setLoading(true)
+                let wasting = wastingFactory()
+                wasting.category = currentSelectedCategory.name
+                wasting.description = description.trim()
+                wasting.title = title.trim()
+                wasting.date = new Date(to_iso_string(date))
+                const [rs, r_value] = value.split('$')
+                let in_us = r_value.trim().replace(/\./g, '').replace(',', '.')
+                wasting.value = Number(in_us)
+                await WastingRepository.addRegister(wasting)
+                setLoading(false)
+                handleOpen('Salvo com sucesso!')
+            } catch (e){
+                handleOpen('Desculpe, algo deu errado.')
+            } finally {
+                navigation.reset({
+                    routes: [{ name: "HomePage" }]
+                })
+                return;
+            }
         }
         setLoading(false)
         
@@ -210,7 +217,7 @@ const New = ({ theme }) => {
                             <Button
                                 style={styles.submitButton}
                                 mode={"contained"}
-                                onPress={handleOk}>
+                                onPress={handleSubmit}>
                                 OK
                             </Button>
                             <Button
@@ -226,4 +233,4 @@ const New = ({ theme }) => {
     )
 }
 
-export default withTheme(New);
+export default withSnackBarConsumer( withTheme(New));

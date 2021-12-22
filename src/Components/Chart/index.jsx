@@ -5,6 +5,7 @@ import { withTheme, Card, ActivityIndicator, Text } from "react-native-paper"
 import WastingRepository from "../../Repository/WastingRepository"
 import { subMonths } from "date-fns"
 import { date } from "faker/lib/locales/en"
+import { useWastings } from "../../providers/Wastings"
 
 function to_month_year_format(date) {
     return `${date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1}/${date.getFullYear()}`
@@ -12,8 +13,7 @@ function to_month_year_format(date) {
 
 const screenWidth = Dimensions.get('window').width
 const Chart = ({ theme, scale }) => {
-    const [loading, setLoading] = useState(true)
-    const [wastings, setWastings] = useState([])
+    const {wastings, setWastings} = useWastings()
     const [data, setData] = useState({
         labels: ["January", "February", "March", "April", "May", "June"],
         datasets: [
@@ -36,9 +36,9 @@ const Chart = ({ theme, scale }) => {
                 return new Date(a.date).getTime() - new Date(b.date).getTime()
             })
         }
-        const boot = async () => {
-            setLoading(true)
-            var _wastings = await WastingRepository.getAllRegiters()  || []
+        const boot = () => {
+            //setLoading(true)
+            var _wastings = wastings
             if (_wastings.length <= 0)
                 return;
             var max = new Date(_wastings[0].date);
@@ -69,7 +69,7 @@ const Chart = ({ theme, scale }) => {
             })
             dates = dates.map(item => to_month_year_format(new Date(item)))
             //console.log(dates, amount)
-            setWastings(_wastings)
+           // setWastings(_wastings)
             setData({
                 labels: dates,
                 datasets: [
@@ -77,7 +77,6 @@ const Chart = ({ theme, scale }) => {
                         data: amount
                     }]
             })
-            setLoading(false)
         }
         boot()
     }, [])
@@ -92,7 +91,6 @@ const Chart = ({ theme, scale }) => {
     return (
         <Card style={{ width: '95%' }}>
             <Card.Content style={{ width: '100%', alignItems: 'flex-start' }}>
-                {!loading ?
                     <LineChart
                         width={screenWidth * (scale || 0.8)}
                         data={data}
@@ -117,7 +115,7 @@ const Chart = ({ theme, scale }) => {
                                 stroke: theme.colors.primary
                             },
                         }}
-                    /> : <ActivityIndicator />}
+                    /> 
             </Card.Content>
         </Card>
     )

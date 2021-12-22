@@ -4,8 +4,10 @@ import Card from "../Card"
 import { withTheme, Text, Paragraph, TextInput } from "react-native-paper"
 import { AntDesign } from "@expo/vector-icons"
 import { subMonths } from "date-fns"
+import { useWastings } from "../../providers/Wastings"
 
-const LatestWastings = ({ wastings, theme }) => {
+const LatestWastings = ({theme }) => {
+    const { wastings } = useWastings();
     const [w, setW] = useState(wastings.filter(item => {
         let today = new Date()
         let _item = new Date(item.date)
@@ -31,8 +33,9 @@ const LatestWastings = ({ wastings, theme }) => {
         return _a
     },[wastings])
     const porcent = useMemo(()=>{
-        let diff = amount - l_amount;
-        return (diff/ l_amount) * 100
+        if(l_amount == 0) return 0;
+            const d =  (amount/l_amount) - 1
+            return d * 100
     }, [l_amount, amount])
     return (
         <Card style={{ minHeight: 100, flexDirection: 'row' }} cardTitle={'Neste mês'}>

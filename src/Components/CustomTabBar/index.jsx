@@ -3,8 +3,8 @@ import { BottomNavigation, withTheme } from "react-native-paper"
 import Dashboard from "../../pages/Dashboard";
 import ListAllWastings from "../../pages/ListAllWastings";
 import { Entypo } from "@expo/vector-icons"
-const CustomTabBar = ({theme, navigation }) =>{
-    const [index, setIndex] = useState(0);
+const CustomTabBar = ({theme, route }) =>{
+    const [index, setIndex] = useState((route.params?.tab_index ? route.params?.tab_index : 0));
     
     const [routes] = useState([
       { key: 'home', title: 'Página Inicial', icon: 'home' },

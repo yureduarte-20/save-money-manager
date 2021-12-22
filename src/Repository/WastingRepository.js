@@ -41,8 +41,6 @@ export default class WastingRepository {
         return null
     }
     static async update({ id, date, description, title, value, category }) {
-        if ((await this.getById(id)) === null)
-            return null
         let registers = await AsyncStorage.getItem(tableName)
         registers = JSON.parse(registers)
         registers = registers.map(item => {

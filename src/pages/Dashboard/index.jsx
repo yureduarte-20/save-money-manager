@@ -1,35 +1,30 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, SafeAreaView, ScrollView, RefreshControl } from "react-native";
-import { Paragraph, FAB, withTheme, ActivityIndicator, Title } from 'react-native-paper'
+import { View, SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import { FAB, withTheme, ActivityIndicator, Title } from 'react-native-paper'
 import styles from "./styles";
 import WastingRepository from "../../Repository/WastingRepository";
 import 'faker/locale/pt_BR'
 import { useNavigation } from "@react-navigation/native";
+import { useWastings } from "../../providers/Wastings"
 import LatestWasting from '../../Components/LatestWastings'
 import LastMonthWasting from "../../Components/LastMonthWasting"
 import Chart from "../../Components/Chart";
 const Dashboard = ({ theme }) => {
     const navigation = useNavigation()
-    const [wastings, setWasting] = useState([])
     const [loading, setLoading] = useState(true)
-    const [refreshing, setRefreshing] = useState(false);
-    const onRefresh = async () => {
-        setRefreshing(true);
-        const v = await WastingRepository.getAllRegiters()
-        setWasting(v)
-        setRefreshing(false)
+    const  { wastings, setRefresh, refresh, setWastings, onRefresh } = useWastings()
 
-    }
     useEffect(() => {
         const starting = async () => {
             setLoading(true)
             var w = await WastingRepository.getAllRegiters()
-            setWasting(w)
+            setWastings(w)
             setLoading(false);
+            console.log("List all Use effect")
         }
         starting()
     }, [])
-    if (loading || refreshing) {
+    if (loading || refresh) {
         return (
             <SafeAreaView style={{...styles.container, justifyContent:'center'}}>
                 <ActivityIndicator />
@@ -51,7 +46,7 @@ const Dashboard = ({ theme }) => {
                 contentContainerStyle={styles.scrollView}
                 refreshControl={
                     <RefreshControl
-                        refreshing={refreshing}
+                        refresh={refresh}
                         onRefresh={onRefresh}
                         colors={[theme.colors.primary_700]}
                     />

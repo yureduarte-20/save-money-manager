@@ -28,7 +28,6 @@ const Routes = ({ theme }) => {
                         animation:"slide_from_bottom"
                     }}
                     name={"New"}
-                    
                     component={New} />
                     <Stack.Screen 
                     name={"Edit"}

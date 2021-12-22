@@ -15,7 +15,4 @@ const Card = (props) => {
     )
 }
 
-Card.propTypes = {
-    style: StyleProp
-}
 export default withTheme (Card)

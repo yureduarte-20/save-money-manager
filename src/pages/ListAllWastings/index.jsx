@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { FlatList, SafeAreaView, View, TouchableOpacity, Button } from "react-native"
-import { Paragraph, Title, Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text, Snackbar } from "react-native-paper"
+import { Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text, Snackbar } from "react-native-paper"
 import { MaterialIcons } from "@expo/vector-icons"
-import WastingRepository from "../../Repository/WastingRepository"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation} from "@react-navigation/native"
 import styles from "./styles"
 import categories from "../../Repository/CategoriesRepository"
-import { from_iso_to_string, to_string_date } from "../../utils/dates"
+import { from_iso_to_string} from "../../utils/dates"
+import { useWastings } from "../../providers/Wastings"
 const filters = ["Data", "Categoria", "Valor", "Todos"]
 const filters_asc_desc = [{ id: 1, name: "Crescente" }, { id: 2, name: "Decrescente" }]
 
@@ -15,8 +15,8 @@ const sortData = (_data, filter, filter_2) => {
     switch (filter) {
         case filters[0]:
             if (filter_2.id === filters_asc_desc[0].id)
-            
-                return copy_data.sort((a, b) => { return (new Date(a.date).getTime() - new Date(b.date).getTime())})
+
+                return copy_data.sort((a, b) => { return (new Date(a.date).getTime() - new Date(b.date).getTime()) })
             else
                 return copy_data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             break;
@@ -28,27 +28,25 @@ const sortData = (_data, filter, filter_2) => {
             break;
         case filters[2]:
             if (filter_2.id === filters_asc_desc[0].id)
-                return copy_data.sort((a, b) => new Number(a.value) - new Number( b.value ))
+                return copy_data.sort((a, b) => new Number(a.value) - new Number(b.value))
             else
-                return copy_data.sort((a, b) => new Number(b.value) - new Number( a.value ) )
+                return copy_data.sort((a, b) => new Number(b.value) - new Number(a.value))
             break;
         default:
             return copy_data;
             break;
     }
 }
-const ListAllWastings = ({ route}) => {
-    const [loading, setLoadding] = useState(true)
-    const [wasting, setWastings] = useState([])
+const ListAllWastings = ({ route }) => {
+    const [loading, setLoadding] = useState(false)
+    const [wasting_sorted, setSortedWastings] = useState([])
     const [filter, setFilter] = useState("Todos")
     const [visible, setVisible] = useState(false);
     const [visible_2, setVisible_2] = useState(false);
 
-    const [ snackVisible, setSnackVisible ] = useState(false)
-    const [ snackMessage, setSnackMessage ] = useState("")
+    const { wastings, refresh, setRefresh, setWastings, onRefresh } = useWastings()
+    const [selectedSecondOption, setSelectedSecondOption] = useState({ id: 2, name: "Decrescente" })
 
-    const [ selectedSecondOption, setSelectedSecondOption] = useState({ id: 2, name: "Decrescente" })
-    const [ refreshing, setRefreshing ] = useState(false)
     const navigation = useNavigation()
     const openMenu = () => setVisible(true);
     const closeMenu = () => setVisible(false);
@@ -67,17 +65,15 @@ const ListAllWastings = ({ route}) => {
         }
     }
     useEffect(() => {
-        const getAll = async () =>{
-            setLoadding(true)
-            let _wasting = await WastingRepository.getAllRegiters()
+        const getAll = () => {
+            let _wasting = wastings
             _wasting = sortData(_wasting, filter, selectedSecondOption)
-            setLoadding(false)
-            setWastings(_wasting)
-            //console.log(_wasting)
+            setSortedWastings(_wasting)
+            console.log("List all Use effect called")
         }
         getAll()
     }, [filter, selectedSecondOption])
-    
+
     const renderSelectedScene = (filter) => {
         switch (filter) {
             case filters[0]:
@@ -100,27 +96,18 @@ const ListAllWastings = ({ route}) => {
             default: return null;
         }
     }
-    const hasAMessage = useCallback((_message) =>{
-        if( _message.hasMessage ){
-            setSnackMessage(_message.message)
-            setSnackVisible(true)
-        }
-    })
-    const handleOnRefresh = useCallback( async () =>{
-        //setLoadding(true);
-        setRefreshing(true)
-        let _wasting = await WastingRepository.getAllRegiters();
+    const handleOnRefresh = useCallback(async () => {
+        await onRefresh()
+        let _wasting = wastings
         _wasting = sortData(_wasting, filter, selectedSecondOption)
-        //setLoadding(false)
-        setWastings(_wasting)
-        setRefreshing(false)
+        setSortedWastings(_wasting)
     })
     const renderItems = ({ item }) => {
-        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', {wasting:item, onGoBack:handleOnRefresh}) }} 
-                           description={() => <Caption>{from_iso_to_string(item.date)}</Caption>}
-                           right={ () => 
-                           <Caption>{`R$ ${ new Number(item.value).toFixed(2).replace('.', ',')}`} </Caption>}>
-                </List.Item> 
+        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', { wasting: item }) }}
+            description={() => <Caption>{from_iso_to_string(item.date)}</Caption>}
+            right={() =>
+                <Caption>{`R$ ${new Number(item.value).toFixed(2).replace('.', ',')}`} </Caption>}>
+        </List.Item>
     }
     if (loading)
         return (
@@ -129,7 +116,7 @@ const ListAllWastings = ({ route}) => {
             </SafeAreaView>
         )
     return (
-        
+
         <SafeAreaView style={styles.container}>
             <View style={styles.searchContainer}>
                 <Menu
@@ -167,12 +154,12 @@ const ListAllWastings = ({ route}) => {
             <List.Section style={styles.listSection}>
                 <List.Subheader > Gastos </List.Subheader>
                 <FlatList
-                    refreshing={refreshing}
-                    data={wasting}
+                    refreshing={refresh}
+                    data={wasting_sorted}
                     renderItem={renderItems}
-                    keyExtractor={(item) => item.id} 
-                    contentContainerStyle={{ width:'100%' }}
-                    onRefresh={handleOnRefresh}/>
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ width: '100%' }}
+                    onRefresh={handleOnRefresh} />
             </List.Section>
         </SafeAreaView>
     )

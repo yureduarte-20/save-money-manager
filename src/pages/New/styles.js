@@ -14,7 +14,7 @@ const styles = StyleSheet.create({
     submitContainer: {
         marginTop: 20,
         width:'100%',
-        paddingHorizontal:10
+        /* paddingHorizontal:10 */
     },
     submitButton:{
         width: '100%',
