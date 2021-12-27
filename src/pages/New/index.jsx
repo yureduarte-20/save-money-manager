@@ -74,7 +74,7 @@ const New = ({ theme, handleOpen }) => {
     return (
         <SafeAreaView
             style={styles.container}>
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.input}>
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={Object.assign({ backgroundColor:theme.colors.background }, styles.input)}>
                 <Paragraph style={styles.title}>Aqui, voce pode cadastrar um novo gasto que fez recentemente. Primeiramente, diga-nos o título, como o nome do lugar que você gastou.</Paragraph>
                 <Caption>ex: Shopping, Mercadão, Feira</Caption>
                 <View style={styles.section}>

@@ -40,7 +40,7 @@ const LatestWastings = ({theme }) => {
     return (
         <Card style={{ minHeight: 100, flexDirection: 'row' }} cardTitle={'Neste mês'}>
             <View style={{ width: '100%', alignItems: 'flex-start', flexDirection:'row', flexWrap:'wrap' }}>
-                <Text style={{ color: theme.colors.primary_700, fontSize: 18 }}>{w.length} compras </Text>
+                <Text style={{ color: theme.colors.primary, fontSize: 18 }}>{w.length} compras </Text>
                 <Paragraph>Total de <Text style={{ color: theme.colors.success }}>{'R$' + String(amount.toFixed(2).replace('.', ','))}</Text>
                 </Paragraph>
                 <Text style={{ marginLeft:'40%',color:porcent >= 0 ? theme.colors.success : theme.colors.error}}>

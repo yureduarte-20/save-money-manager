@@ -57,7 +57,7 @@ const Edit = ({ route, theme, handleOpen }) => {
                 updated_wasting.description = description.trim()
                 updated_wasting.title = title.trim()
                 updated_wasting.date = new Date(to_iso_string(date))
-                const [rs, r_value] =  (typeof value === 'string') ? value.split('$') : ['$', value.toPrecision(2)]
+                const [rs, r_value] =  (typeof value === 'string') ? value.split('$') : ['$', value.toFixed(2)]
                 let in_us = (typeof value === 'string') ? r_value.trim().replace(/\./g, '').replace(',', '.') : r_value
                 updated_wasting.value = Number(in_us)
                 await WastingRepository.update(updated_wasting)
@@ -80,7 +80,6 @@ const Edit = ({ route, theme, handleOpen }) => {
             }
         }
         setLoading(false)
-
     }
     const deleteRegister = async (id) => {
         setLoading(true)
@@ -115,8 +114,8 @@ const Edit = ({ route, theme, handleOpen }) => {
                 </Menu>
             </Appbar.Header>
             <SafeAreaView
-                style={styles.container}>
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.input}>
+                style={Object.assign({backgroundColor:theme.colors.background},styles.container)}>
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={Object.assign({backgroundColor:theme.colors.background},styles.input)}>
                     <Paragraph style={styles.title}>Edite os dados e pressione em salvar, se não em cancelar.</Paragraph>
                     {/* <Caption>ex: Shopping, Mercadão, Feira</Caption> */}
                     <View style={styles.section}>

@@ -1,7 +1,6 @@
 import React from "react"
 import { Appbar, withTheme } from "react-native-paper"
 import { FontAwesome } from '@expo/vector-icons'
-import { Alert } from 'react-native';
 
 function CustomAppBar({ navigation, back, options, theme, route }) {
   return (

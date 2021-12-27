@@ -60,7 +60,7 @@ const Dashboard = ({ theme }) => {
                     <LatestWasting wastings={wastings} />
                     <LastMonthWasting wastings={wastings} />
                 </View>
-                <Chart wastings={wastings} scale={1.0} />
+                <Chart wastings={wastings} scale={0.9} />
             </ScrollView>
             <FAB style={styles.FAB}
                 icon={'plus'}

@@ -89,30 +89,34 @@ const Chart = ({ theme, scale }) => {
             </Card>
         )
     return (
-        <Card style={{ width: '95%' }}>
+        <Card style={{ width: '100%' }}>
             <Card.Content style={{ width: '100%', alignItems: 'flex-start' }}>
                     <LineChart
                         width={screenWidth * (scale || 0.8)}
                         data={data}
                         height={220}
-                        withInnerLines={false}
+                        withInnerLines={true}
+                        withVerticalLines={false}
+                        withHorizontalLines={false}
+                        
                         chartConfig={{
-                            backgroundColor: theme.colors.surface,
-                            backgroundGradientFrom: theme.colors.surface,
-                            backgroundGradientTo: theme.colors.surface,
+                            backgroundColor: theme.colors.background,
+                            backgroundGradientFrom: theme.colors.background,
+                            backgroundGradientTo: theme.colors.background,
                             decimalPlaces: 2, // optional, defaults to 2dp
                             propsForBackgroundLines: {
-
+                                
                             },
-                            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                            color: (opacity = 1) => `rgba(55, 0, 179, ${opacity})`,
+                            labelColor: (opacity = 1) => /* `rgba(0, 0, 0, ${opacity})` */ theme.colors.primary,
+                            color: (opacity = 1) => /* `rgba(55, 0, 179, ${opacity})` */theme.colors.text,
                             style: {
-                                borderRadius: 16
+                                borderRadius: 16,
+
                             },
                             propsForDots: {
                                 r: "2",
                                 strokeWidth: "2",
-                                stroke: theme.colors.primary
+                                stroke: theme.colors.onSurface
                             },
                         }}
                     /> 

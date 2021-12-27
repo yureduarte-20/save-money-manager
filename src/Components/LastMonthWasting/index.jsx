@@ -23,7 +23,7 @@ const LastMonthWasting = ({  theme }) => {
     return (
         <Card style={{ minHeight: 100, }} cardTitle={'Mês passado'}>
             <View style={{ width: '100%', alignItems: 'flex-start' }}>
-                <Text style={{ color: theme.colors.primary_700, fontSize: 18 }}>{w.length} compras </Text>
+                <Text style={{ color: theme.colors.primary, fontSize: 18 }}>{w.length} compras </Text>
                 <Paragraph>Total de <Text style={{ color: theme.colors.error }}>{'R$' + String(amount.toFixed(2).replace('.', ','))}</Text></Paragraph>
             </View>
         </Card>
