@@ -1,10 +1,8 @@
-import React, { useEffect, useMemo, useReducer, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Dimensions } from "react-native"
 import { LineChart } from "react-native-chart-kit"
-import { withTheme, Card, ActivityIndicator, Text } from "react-native-paper"
-import WastingRepository from "../../Repository/WastingRepository"
+import { withTheme, Card, Text } from "react-native-paper"
 import { subMonths } from "date-fns"
-import { date } from "faker/lib/locales/en"
 import { useWastings } from "../../providers/Wastings"
 
 function to_month_year_format(date) {

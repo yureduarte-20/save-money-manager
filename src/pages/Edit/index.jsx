@@ -51,7 +51,7 @@ const Edit = ({ route, theme, handleOpen }) => {
         if (!checkAllFields()) {
             try {
                 setLoading(true)
-                let updated_wasting = wastingFactory()
+                let updated_wasting = wastingFactory() 
                 updated_wasting.id = wasting.id
                 updated_wasting.category = currentSelectedCategory.name
                 updated_wasting.description = description.trim()
@@ -60,6 +60,7 @@ const Edit = ({ route, theme, handleOpen }) => {
                 const [rs, r_value] =  (typeof value === 'string') ? value.split('$') : ['$', value.toFixed(2)]
                 let in_us = (typeof value === 'string') ? r_value.trim().replace(/\./g, '').replace(',', '.') : r_value
                 updated_wasting.value = Number(in_us)
+                console.log(updated_wasting)
                 await WastingRepository.update(updated_wasting)
                 handleOpen('Salvo com sucesso!')
             } catch (e) {

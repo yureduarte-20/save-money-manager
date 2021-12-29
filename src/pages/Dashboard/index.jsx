@@ -19,6 +19,7 @@ const Dashboard = ({ theme }) => {
             setLoading(true)
             var w = await WastingRepository.getAllRegiters()
             setWastings(w)
+            console.log(w)
             setLoading(false);
             console.log("List all Use effect")
         }
