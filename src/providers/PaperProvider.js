@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { createContext, useContext } from 'react'
 import { Provider, DefaultTheme, DarkTheme } from "react-native-paper"
 import { StatusBar } from "react-native"
-const getSetuptedThemeOrDefaultTheme = async () => {
+const getDefinedThemeOrDefaultTheme = async () => {
     let option = await AsyncStorage.getItem('theme_option') || 'default'
     return option
 }
@@ -33,7 +33,7 @@ const PaperProvider = ({ children }) => {
     const [_theme, setTheme] = React.useState(theme)
     React.useEffect(() => {
         const setup = async () => {
-            let option = await getSetuptedThemeOrDefaultTheme()
+            let option = await getDefinedThemeOrDefaultTheme()
             setTheme(option == "dark" ? darkTheme : theme)
         }
         setup()
