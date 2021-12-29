@@ -54,6 +54,7 @@ export default class WastingRepository {
                     category: category
                 }
             }
+            return item;
         })
         await AsyncStorage.setItem(tableName, JSON.stringify(registers))
         return true
