@@ -18,7 +18,7 @@ export const SnackProvider = props => {
             () => setState({ ...state, show: false }),
             state.timedOut)
     }
-    handleClose = () => {
+    const handleClose = () => {
         setState({
             ...state,
             show: false,

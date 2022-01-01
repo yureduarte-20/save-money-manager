@@ -4,9 +4,9 @@ import React from "react"
 import SnackBar from "../Components/SnackBar"
 import PaperProvider from './PaperProvider'
 
-export default function Providers({ children }) {
+export default function Providers({ children, paperTheme }) {
     return (
-        <PaperProvider>
+        <PaperProvider definedTheme={ paperTheme }>
             <WastingsProvider>
                 <SnackProvider>
                     {children}

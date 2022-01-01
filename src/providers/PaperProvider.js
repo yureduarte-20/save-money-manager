@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { createContext, useContext } from 'react'
 import { Provider, DefaultTheme, DarkTheme } from "react-native-paper"
 import { StatusBar } from "react-native"
-const getDefinedThemeOrDefaultTheme = async () => {
+export const getDefinedThemeOrDefaultTheme = async () => {
     let option = await AsyncStorage.getItem('theme_option') || 'default'
     return option
 }
@@ -29,15 +29,15 @@ const darkTheme = {
 }
 const PaperContext = createContext()
 
-const PaperProvider = ({ children }) => {
-    const [_theme, setTheme] = React.useState(theme)
-    React.useEffect(() => {
+const PaperProvider = ({ children, definedTheme }) => {
+    const [_theme, setTheme] = React.useState( definedTheme === 'dark' ? darkTheme : theme)
+/*     React.useEffect(() => {
         const setup = async () => {
             let option = await getDefinedThemeOrDefaultTheme()
             setTheme(option == "dark" ? darkTheme : theme)
         }
         setup()
-    }, [])
+    }, []) */
     StatusBar.setBackgroundColor(_theme.colors.primary_700)
     StatusBar.setBarStyle('light-content')
     const changeTheme = async (theme_name) => {
