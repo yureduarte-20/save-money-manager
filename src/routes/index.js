@@ -1,12 +1,12 @@
 import React from "react"
 import { NavigationContainer } from "@react-navigation/native"
-import New from "../pages/New";
+import New from "../screens/New";
 import { withTheme } from "react-native-paper"
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomAppBar from "../Components/CustomAppBar";
 import CustomTabBar from "../Components/CustomTabBar";
-import Edit from "../pages/Edit";
-import Settings from "../pages/Settings";
+import Edit from "../screens/Edit";
+import Settings from "../screens/Settings";
 
 const Stack = createNativeStackNavigator();
 

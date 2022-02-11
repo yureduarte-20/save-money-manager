@@ -1,43 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { createContext, useContext } from 'react'
-import { Provider, DefaultTheme, DarkTheme } from "react-native-paper"
+import { Provider } from "react-native-paper"
 import { StatusBar } from "react-native"
+import { darkTheme, theme } from '../../assets/themes'
 export const getDefinedThemeOrDefaultTheme = async () => {
     let option = await AsyncStorage.getItem('theme_option') || 'default'
     return option
-}
-const theme = {
-    name:'default',
-    ...DefaultTheme,
-    roundness: 2,
-    colors: {
-        ...DefaultTheme.colors,
-        primary_700: '#3700b3',
-        success: '#04b60c'
-    },
-}
-const darkTheme = {
-    name:'dark',
-    ...DarkTheme,
-    roundness: 2,
-    colors: {
-        ...DarkTheme.colors,
-        primary_700: DarkTheme.colors.surface,
-        success: '#04b60c'
-    }
-
 }
 const PaperContext = createContext()
 
 const PaperProvider = ({ children, definedTheme }) => {
     const [_theme, setTheme] = React.useState( definedTheme === 'dark' ? darkTheme : theme)
-/*     React.useEffect(() => {
-        const setup = async () => {
-            let option = await getDefinedThemeOrDefaultTheme()
-            setTheme(option == "dark" ? darkTheme : theme)
-        }
-        setup()
-    }, []) */
     StatusBar.setBackgroundColor(_theme.colors.primary_700)
     StatusBar.setBarStyle('light-content')
     const changeTheme = async (theme_name) => {

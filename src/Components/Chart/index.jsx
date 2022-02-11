@@ -105,8 +105,8 @@ const Chart = ({ theme, scale }) => {
                             propsForBackgroundLines: {
                                 
                             },
-                            labelColor: (opacity = 1) => /* `rgba(0, 0, 0, ${opacity})` */ theme.colors.primary,
-                            color: (opacity = 1) => /* `rgba(55, 0, 179, ${opacity})` */theme.colors.text,
+                            labelColor: (opacity = 1) => /* `rgba(0, 0, 0, ${opacity})` */ theme.colors.text,
+                            color: (opacity = 1) => /* `rgba(55, 0, 179, ${opacity})` */theme.colors.primary,
                             style: {
                                 borderRadius: 16,
 
