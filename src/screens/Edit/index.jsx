@@ -111,7 +111,7 @@ const Edit = ({ route, theme, handleOpen }) => {
                 <Menu
                     visible={visible}
                     onDismiss={hideOptionsMenu}
-                    anchor={<Feather name="more-vertical" size={28} onPress={showOptionsMenu} color={theme.colors.surface} />}  >
+                    anchor={<Feather name="more-vertical" size={28} onPress={showOptionsMenu} color={theme.colors.onSurface} />}  >
                     <Menu.Item onPress={() => { hideOptionsMenu(); deleteRegister(wasting.id) }} title={"Excluir"} />
                 </Menu>
             </Appbar.Header>

@@ -36,7 +36,8 @@ const styles = StyleSheet.create({
         marginTop: '10%',
         minHeight: 60,
         alignItems:'center',
-        justifyContent:'center'
+        justifyContent:'center',
+        borderWidth:1
         
      },
     viewMenu: {

@@ -85,7 +85,7 @@ const New = ({ theme, handleOpen }) => {
     }
     return (
         <SafeAreaView
-            style={styles.container}>
+            style={[styles.container, { backgroundColor:theme.colors.background }]}>
             <ScrollView style={{ flex: 1 }} contentContainerStyle={Object.assign({ backgroundColor:theme.colors.background }, styles.input)}>
                 <Paragraph style={styles.title}>Aqui, voce pode cadastrar um novo gasto que fez recentemente. Primeiramente, diga-nos o título, como o nome do lugar que você gastou.</Paragraph>
                 <Caption>ex: Shopping, Mercadão, Feira</Caption>
@@ -154,10 +154,11 @@ const New = ({ theme, handleOpen }) => {
                             onDismiss={hideMenu}
                             anchor={
                                 <TouchableOpacity
-                                    style={[styles.buttonMenu, { backgroundColor: theme.colors.surface }]} onPress={showMenu}>
+                                    style={[styles.buttonMenu, { backgroundColor: theme.colors.surface, borderColor:theme.colors.onSurface }]} onPress={showMenu}>
                                     <Text style={{
                                         textTransform: 'uppercase',
                                         letterSpacing: 2.0,
+                                        color: theme.colors.onSurface
                                     }}>{currentSelectedCategory.name}</Text>
                                 </TouchableOpacity>}>
                             {
@@ -171,7 +172,7 @@ const New = ({ theme, handleOpen }) => {
                     <View style={styles.inputView}>
                         <Caption style={{ textAlign:'center' }}>Data</Caption>
                         <TouchableOpacity
-                                    style={[styles.buttonMenu, { backgroundColor: theme.colors.surface }]} onPress={() => setOpen(true)}>
+                                    style={[styles.buttonMenu, {  backgroundColor: theme.colors.surface, borderColor:theme.colors.onSurface }]} onPress={() => setOpen(true)}>
                                     <Text style={{
                                         textTransform: 'uppercase',
                                         letterSpacing: 2.0,

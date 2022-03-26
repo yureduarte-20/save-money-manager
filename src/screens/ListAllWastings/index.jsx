@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { FlatList, SafeAreaView, View, TouchableOpacity, Button } from "react-native"
-import { Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text, Snackbar } from "react-native-paper"
+import { Caption, List, ActivityIndicator, Divider, Menu, IconButton, Text, Snackbar, DataTable } from "react-native-paper"
 import { MaterialIcons } from "@expo/vector-icons"
 import { useNavigation} from "@react-navigation/native"
 import styles from "./styles"
@@ -103,11 +103,13 @@ const ListAllWastings = ({ route }) => {
         setSortedWastings(_wasting)
     })
     const renderItems = ({ item }) => {
-        return <List.Item title={item.title} onPress={() => { navigation.navigate('Edit', { wasting: item }) }}
-            description={() => <Caption>{from_iso_to_string(item.date)}</Caption>}
-            right={() =>
-                <Caption>{`R$ ${new Number(item.value).toFixed(2).replace('.', ',')}`} </Caption>}>
-        </List.Item>
+        return (
+            <DataTable.Row key={item.id} onPress={() =>{ navigation.navigate('Edit', { wasting:item }) }}>
+                <DataTable.Cell>{item.title}</DataTable.Cell>
+                <DataTable.Cell>{ "R$ " + item.value.toFixed(2).replace('.', ',')}</DataTable.Cell>
+                <DataTable.Cell>{from_iso_to_string (item.date)}</DataTable.Cell>
+            </DataTable.Row>
+        )
     }
     if (loading)
         return (
@@ -151,7 +153,7 @@ const ListAllWastings = ({ route }) => {
                 </Menu>
                 <Divider />
             </View>
-            <List.Section style={styles.listSection}>
+           {/*  <List.Section style={styles.listSection}>
                 <List.Subheader > Gastos </List.Subheader>
                 <FlatList
                     refreshing={refresh}
@@ -160,7 +162,22 @@ const ListAllWastings = ({ route }) => {
                     keyExtractor={(item) => item.id}
                     contentContainerStyle={{ width: '100%' }}
                     onRefresh={handleOnRefresh} />
-            </List.Section>
+                </List.Section> */}
+
+            <DataTable style={{ marginTop:20 }}>
+                <DataTable.Header>
+                    <DataTable.Title>Título</DataTable.Title>
+                    <DataTable.Title>Valor</DataTable.Title>
+                    <DataTable.Title>Data</DataTable.Title>
+                </DataTable.Header>
+                <FlatList
+                    refreshing={refresh}
+                    data={wasting_sorted}
+                    renderItem={renderItems}
+                    keyExtractor={(item) => item.id}
+                    contentContainerStyle={{ width: '100%' }}
+                    onRefresh={handleOnRefresh} />
+            </DataTable>
         </SafeAreaView>
     )
 }
