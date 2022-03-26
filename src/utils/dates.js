@@ -1,4 +1,4 @@
-const to_string_date = (date) => `${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}/${date.getMonth() + 1 < 10 ? '0' + date.getMonth() + 1: date.getMonth() + 1}/${date.getFullYear()}`
+const to_string_date = (date) => `${date.getDate() < 10 ? '0' + date.getDate() : date.getDate()}/${(date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1): date.getMonth() + 1}/${date.getFullYear()}`
 const to_iso_string = (date) => {
     let [day, month, year] = date.split('/')
     let _d = [year, month, day].join('-')

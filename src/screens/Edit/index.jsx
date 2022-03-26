@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View, TouchableOpacity } from "react-native"
 import { withTheme, TextInput, Appbar, Menu, Text, Paragraph, Caption, HelperText, Subheading, Button, ActivityIndicator, Divider } from "react-native-paper"
 import { to_iso_string, to_string_date } from "../../utils/dates";
-import { isValid, isAfter } from "date-fns"
+import { isValid, isAfter, startOfDay, endOfDay } from "date-fns"
 import { Feather } from "@expo/vector-icons"
 import { TextInputMask } from "react-native-masked-text"
 import styles from "./styles";
@@ -11,16 +11,18 @@ import { useWastings } from "../../providers/Wastings";
 import { useNavigation } from "@react-navigation/native";
 import { withSnackBarConsumer } from "../../providers/SnackBarContext";
 import categories from '../../Repository/CategoriesRepository'
-import wastingFactory  from '../../factories/wasting'
+import wastingFactory from '../../factories/wasting';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const Edit = ({ route, theme, handleOpen }) => {
     const [wasting, setWasting] = useState(route.params.wasting)
     const [visible, setVisible] = useState(false)
-    const [date, setDate] = useState(to_string_date(new Date(wasting.date)))
+    const [open, setOpen] = useState(false);
+    const [date, setDate] = useState(new Date(wasting.date))
     const navigation = useNavigation()
     const [active, setActive] = useState(false);
     const [currentSelectedCategory, setCurrentSelectedCategory] = useState(categories.filter(item => wasting.category === item.name)[0])
-    const [value, setValue] = useState( wasting.value )
+    const [value, setValue] = useState(wasting.value)
     const [error, setError] = useState({
         date: {
             message: "",
@@ -33,15 +35,14 @@ const Edit = ({ route, theme, handleOpen }) => {
     const [title, setTitle] = useState(wasting.title)
     const [loading, setLoading] = useState(false)
     const handleChangeDate = (e) => {
-        setDate(e)
+        setDate( startOfDay(e))
     }
 
-    
+
     const checkAllFields = () => {
         console.log(title, value, date)
         if (title === '') setError(state => ({ ...state, title: true }))
         if (value === '' || value === "R$0,00" || value === 0) setError(state => ({ ...state, value: true }))
-        if (new Date(to_iso_string(date)).getTime() > new Date().getTime()) setError(state => ({ ...state, date: { message: "A data não pode ser maior que hoje", error: true } }))
         return error.date.error || error.title || error.value
     }
     const showMenu = () => setActive(true)
@@ -51,13 +52,13 @@ const Edit = ({ route, theme, handleOpen }) => {
         if (!checkAllFields()) {
             try {
                 setLoading(true)
-                let updated_wasting = wastingFactory() 
+                let updated_wasting = wastingFactory()
                 updated_wasting.id = wasting.id
                 updated_wasting.category = currentSelectedCategory.name
                 updated_wasting.description = description.trim()
                 updated_wasting.title = title.trim()
-                updated_wasting.date = new Date(to_iso_string(date))
-                const [rs, r_value] =  (typeof value === 'string') ? value.split('$') : ['$', value.toFixed(2)]
+                updated_wasting.date = date
+                const [rs, r_value] = (typeof value === 'string') ? value.split('$') : ['$', value.toFixed(2)]
                 let in_us = (typeof value === 'string') ? r_value.trim().replace(/\./g, '').replace(',', '.') : r_value
                 updated_wasting.value = Number(in_us)
                 console.log(updated_wasting)
@@ -77,7 +78,7 @@ const Edit = ({ route, theme, handleOpen }) => {
                             }
                         }]
                 })
-                return; 
+                return;
             }
         }
         setLoading(false)
@@ -115,8 +116,8 @@ const Edit = ({ route, theme, handleOpen }) => {
                 </Menu>
             </Appbar.Header>
             <SafeAreaView
-                style={Object.assign({backgroundColor:theme.colors.background},styles.container)}>
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={Object.assign({backgroundColor:theme.colors.background},styles.input)}>
+                style={Object.assign({ backgroundColor: theme.colors.background }, styles.container)}>
+                <ScrollView style={{ flex: 1 }} contentContainerStyle={Object.assign({ backgroundColor: theme.colors.background }, styles.input)}>
                     <Paragraph style={styles.title}>Edite os dados e pressione em salvar, se não em cancelar.</Paragraph>
                     {/* <Caption>ex: Shopping, Mercadão, Feira</Caption> */}
                     <View style={styles.section}>
@@ -177,7 +178,7 @@ const Edit = ({ route, theme, handleOpen }) => {
                     {/* <Subheading style={styles.title}>Certo, agora dê um título para este gasto e quando você fez.</Subheading> */}
                     <View style={styles.section}>
                         <View style={styles.viewMenu}>
-                            
+
                             <Menu
                                 visible={active}
                                 onDismiss={hideMenu}
@@ -190,8 +191,8 @@ const Edit = ({ route, theme, handleOpen }) => {
                                         }}>{currentSelectedCategory.name}</Text>
                                     </TouchableOpacity>}>
 
-                                        <Menu.Item disabled={true} title="Selecione uma categoria abaixo"/>
-                                        <Divider />
+                                <Menu.Item disabled={true} title="Selecione uma categoria abaixo" />
+                                <Divider />
                                 {
 
                                     categories.map(item => {
@@ -200,37 +201,25 @@ const Edit = ({ route, theme, handleOpen }) => {
                                     })
                                 }
                             </Menu>
-                           {/*  <Caption style={{ marginTop: '10%' }}>Categoria</Caption> */}
+                            {/*  <Caption style={{ marginTop: '10%' }}>Categoria</Caption> */}
                         </View>
                         <View style={styles.inputView}>
-                            <TextInput
-                                keyboardType="decimal-pad"
-                                onChangeText={handleChangeDate}
-                                label={"*Data Obrigatória"}
-                                style={styles.input}
-                                onSubmitEditing={() => {
-                                    let _d = to_iso_string(date)
-                                    //console.log(_d)
-                                    if (!isValid(new Date(_d)) || isAfter(new Date(_d), new Date()))
-                                        setError(state => ({ ...state, date: { message: "Data inválida", error: true } }))
-                                    else
-                                        setError(state => ({ ...state, date: { error: false, message: "" } }))
-
-
-                                }}
-                                value={date}
-                                error={error.date.error}
-                                render={props => (
-                                    <TextInputMask
-                                        {...props}
-                                        type={'datetime'}
-                                        options={{
-                                            format: 'DD/MM/YYYY'
-                                        }}
-                                    />
-                                )}
+                            
+                            <TouchableOpacity
+                                style={[styles.buttonMenu, { backgroundColor: theme.colors.surface }]} onPress={() => setOpen(true)}>
+                                <Text style={{
+                                    textTransform: 'uppercase',
+                                    letterSpacing: 2.0,
+                                }}>{to_string_date(date)}</Text>
+                            </TouchableOpacity>
+                            <DateTimePickerModal
+                                isVisible={open}
+                                onCancel={() => setOpen(false)}
+                                onConfirm={handleChangeDate}
+                                maximumDate={endOfDay(new Date())}
+                                locale="pt-Br"
+                                date={date}
                             />
-                            <HelperText type={"error"} visible={error.date.error}>{error.date.message}</HelperText>
                         </View>
                     </View>
                     <View styles={styles.section}>

@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
         paddingHorizontal:10
     },
     buttonMenu: {
-        width: '100%',
         minWidth: 140,
         marginTop: '10%',
         minHeight: 60,

@@ -1,5 +1,6 @@
 {
   "expo": {
+    "userInterfaceStyle": "automatic",
     "name": "SaveMoneyManager",
     "slug": "SaveMoneyManager",
     "version": "1.0.0",
